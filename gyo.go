@@ -1,6 +1,8 @@
 package gyo
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 )
@@ -24,6 +26,14 @@ func (self *Gyo) YoAll() (res *http.Response, err error) {
 func (self *Gyo) Yo(username string) (res *http.Response, err error) {
 	res, err = self.dispatchRequest("/yo/", map[string]string{"username": username})
 	return
+}
+
+func (self *Gyo) Server(path string, port int, callback func(username string)) {
+	http.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
+		callback(r.URL.Query().Get("username"))
+	})
+
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
 }
 
 func (self *Gyo) dispatchRequest(path string, params map[string]string) (res *http.Response, err error) {
