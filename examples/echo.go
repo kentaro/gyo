@@ -8,14 +8,19 @@ import (
 
 var apiToken = flag.String("token", "", "API Token")
 var port = flag.Int("port", 8080, "Port of the server")
+var path = flag.String("path", "/callback", "Callback URL of the server")
 
 func init() {
 	flag.Parse()
 }
 
 func main() {
+	if *apiToken == "" {
+		log.Fatalln("API token is required")
+	}
+
 	gyo := gyo.NewGyo(*apiToken)
-	gyo.Server("/callback", *port, func(username string) {
+	gyo.Server(*path, *port, func(username string) {
 		gyo.Yo(username)
 		log.Printf("Sent Yo to %s\n", username)
 	})
